@@ -1,3 +1,17 @@
+> **AstrBot branch**: `master` tracks the upstream NoneBot project. The
+> `astrbot` branch is installable directly by AstrBot and provides native
+> AstrBot commands, OAuth sessions, image cards and durable plugin data.
+>
+> Install: `git clone -b astrbot https://github.com/XiaoLan9999/nonebot-plugin-osubot.git data/plugins/osu`
+>
+> Configure the osu! API Client ID, Client Secret and callback URI in AstrBot.
+> OAuth tokens, account links and news state are stored under AstrBot's
+> `plugin_data/osu` directory and are never committed.
+>
+> Based on upstream `master` commit `6af33a9`, with the AstrBot API/track
+> integration from `gameswu/astrbot_plugin_osutrack`. Upstream AGPL-3.0
+> authorship is preserved; AstrBot integration is maintained by XiaoLan9999.
+
 <div align="center">
   <a href="https://v2.nonebot.dev/store"><img src="https://github.com/A-kirami/nonebot-plugin-template/blob/resources/nbp_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
   <br>

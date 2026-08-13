@@ -1,0 +1,7 @@
+name: osu
+desc: 基于 osu! API v2 与 osu!track 的 AstrBot 原生插件
+version: v0.4.0
+author: XiaoLan9999 / gameswu / yaowan233
+repo: https://github.com/XiaoLan9999/nonebot-plugin-osubot/tree/astrbot
+display_name: osu!
+astrbot_version: ">=4.9.2"
