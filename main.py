@@ -47,10 +47,10 @@ HELP_TEXT = """OSUBot 7.2.8 AstrBot 适配版
 
 
 @register(
-    "astrbot_plugin_osubot",
+    "osu",
     "XiaoLan9999 / yaowan233",
     "AiriBot nonebot-plugin-osubot 7.2.8 的 AstrBot 原生适配",
-    "0.1.0",
+    "0.5.0",
     "https://github.com/XiaoLan9999/nonebot-plugin-osubot/tree/astrbot-native",
 )
 class OSUBotPlugin(Star):
