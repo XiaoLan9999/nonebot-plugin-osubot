@@ -27,7 +27,7 @@ os.environ["OSUBOT_ASTRBOT_RUNTIME"] = "1"
 
 
 HELP_TEXT = """OSUBot 7.2.8 AstrBot 适配版
-/bind <用户名/UID/主页链接> - 绑定 osu! 账号
+/bind（或 /osubind）<用户名/UID/主页链接> - 绑定 osu! 账号
 /unbind - 解除绑定
 /mode <o/t/c/m> - 修改默认模式
 /info [玩家] [:模式] [#天数] - 玩家信息
@@ -50,7 +50,7 @@ HELP_TEXT = """OSUBot 7.2.8 AstrBot 适配版
     "osu",
     "XiaoLan9999 / yaowan233",
     "AiriBot nonebot-plugin-osubot 7.2.8 的 AstrBot 原生适配",
-    "0.5.0",
+    "0.5.1",
     "https://github.com/XiaoLan9999/nonebot-plugin-osubot/tree/astrbot-native",
 )
 class OSUBotPlugin(Star):
@@ -285,7 +285,7 @@ class OSUBotPlugin(Star):
     async def osu_help(self, event: AstrMessageEvent):
         yield event.plain_result(HELP_TEXT)
 
-    @filter.command("bind")
+    @filter.command("bind", alias={"osubind"})
     async def bind(self, event: AstrMessageEvent):
         name = self._argument(event)
         if not name:
@@ -322,7 +322,7 @@ class OSUBotPlugin(Star):
             logger.exception("OSUBot bind failed")
             yield event.plain_result(f"绑定失败：{exc}")
 
-    @filter.command("unbind")
+    @filter.command("unbind", alias={"osuunbind"})
     async def unbind(self, event: AstrMessageEvent):
         from nonebot_plugin_osubot.runtime import get_session
 
@@ -332,7 +332,7 @@ class OSUBotPlugin(Star):
             await session.commit()
         yield event.plain_result("解绑成功。" if result.rowcount else "尚未绑定，无需解绑。")
 
-    @filter.command("mode")
+    @filter.command("mode", alias={"osumode"})
     async def mode(self, event: AstrMessageEvent):
         from nonebot_plugin_osubot.runtime import get_session
         from nonebot_plugin_osubot.utils import GMN, NGM, parse_mode
@@ -352,7 +352,7 @@ class OSUBotPlugin(Star):
             await session.commit()
         yield event.plain_result(f"默认模式已修改为 {GMN[NGM[mode]]}。")
 
-    @filter.command("info")
+    @filter.command("info", alias={"osuinfo"})
     async def info(self, event: AstrMessageEvent):
         try:
             state = await self._state(event, "info")
@@ -414,7 +414,7 @@ class OSUBotPlugin(Star):
             state["source"],
         )
 
-    @filter.command("bp")
+    @filter.command("bp", alias={"osubp"})
     async def bp(self, event: AstrMessageEvent):
         try:
             yield self._image_result(event, await self._draw_bp_command(event, "bp"))
@@ -422,7 +422,7 @@ class OSUBotPlugin(Star):
             logger.exception("OSUBot bp failed")
             yield event.plain_result(f"查询 BP 失败：{exc}")
 
-    @filter.command("pfm", alias={"bl", "bplist"})
+    @filter.command("pfm", alias={"bl", "bplist", "osubl"})
     async def pfm(self, event: AstrMessageEvent):
         try:
             yield self._image_result(event, await self._draw_bp_command(event, "pfm"))
@@ -430,7 +430,7 @@ class OSUBotPlugin(Star):
             logger.exception("OSUBot BP list failed")
             yield event.plain_result(f"查询 BP 列表失败：{exc}")
 
-    @filter.command("tbp", alias={"nb", "todaybp"})
+    @filter.command("tbp", alias={"nb", "todaybp", "osutbp"})
     async def tbp(self, event: AstrMessageEvent):
         try:
             yield self._image_result(event, await self._draw_bp_command(event, "tbp"))
@@ -454,7 +454,7 @@ class OSUBotPlugin(Star):
         self._last_map[self._context_key(event)] = (int(map_id), int(set_id) if set_id else None)
         return image
 
-    @filter.command("recent", alias={"re", "RE"})
+    @filter.command("recent", alias={"re", "RE", "osurecent"})
     async def recent(self, event: AstrMessageEvent):
         try:
             yield self._image_result(event, await self._recent(event, "recent"))
@@ -462,7 +462,7 @@ class OSUBotPlugin(Star):
             logger.exception("OSUBot recent failed")
             yield event.plain_result(f"查询最近成绩失败：{exc}")
 
-    @filter.command("pr", alias={"PR"})
+    @filter.command("pr", alias={"PR", "osupr"})
     async def pr(self, event: AstrMessageEvent):
         try:
             yield self._image_result(event, await self._recent(event, "pr"))
@@ -470,7 +470,7 @@ class OSUBotPlugin(Star):
             logger.exception("OSUBot passed recent failed")
             yield event.plain_result(f"查询最近通过成绩失败：{exc}")
 
-    @filter.command("map", alias={"m"})
+    @filter.command("map", alias={"m", "osumap"})
     async def map(self, event: AstrMessageEvent):
         try:
             state = await self._state(event, "map", require_user=False)
@@ -486,7 +486,7 @@ class OSUBotPlugin(Star):
             logger.exception("OSUBot map failed")
             yield event.plain_result(f"查询谱面失败：{exc}")
 
-    @filter.command("bmap", alias={"bm"})
+    @filter.command("bmap", alias={"bm", "osubmap"})
     async def bmap(self, event: AstrMessageEvent):
         try:
             state = await self._state(event, "bmap", require_user=False)
@@ -499,7 +499,7 @@ class OSUBotPlugin(Star):
             logger.exception("OSUBot beatmapset failed")
             yield event.plain_result(f"查询谱面集失败：{exc}")
 
-    @filter.command("score", alias={"sc"})
+    @filter.command("score", alias={"sc", "osuscore"})
     async def score(self, event: AstrMessageEvent):
         try:
             state = await self._state(event, "score")
@@ -515,7 +515,7 @@ class OSUBotPlugin(Star):
             logger.exception("OSUBot score failed")
             yield event.plain_result(f"查询谱面成绩失败：{exc}")
 
-    @filter.command("history", alias={"hs"})
+    @filter.command("history", alias={"hs", "osuhistory"})
     async def history(self, event: AstrMessageEvent):
         try:
             state = await self._state(event, "history")
@@ -559,7 +559,7 @@ class OSUBotPlugin(Star):
         plt.close(figure)
         return output.getvalue()
 
-    @filter.command("update")
+    @filter.command("update", alias={"osuupdate"})
     async def update(self, event: AstrMessageEvent):
         row = await self._bound_user(str(event.get_sender_id()))
         if not row:
@@ -572,7 +572,7 @@ class OSUBotPlugin(Star):
             logger.exception("OSUBot manual update failed")
             yield event.plain_result(f"更新玩家数据失败：{exc}")
 
-    @filter.command("mu")
+    @filter.command("mu", alias={"osumu"})
     async def mu(self, event: AstrMessageEvent):
         try:
             state = await self._state(event, "mu")
