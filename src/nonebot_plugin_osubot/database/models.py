@@ -4,7 +4,10 @@ from typing import Optional
 from sqlalchemy import BigInteger, Boolean, Date, Float, Integer, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from nonebot_plugin_orm import Model
+try:
+    from nonebot_plugin_orm import Model
+except (ImportError, RuntimeError):
+    from ..runtime import Model
 
 
 class UserData(Model):

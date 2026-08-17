@@ -5,7 +5,6 @@ from datetime import date, datetime, timedelta
 
 from PIL import UnidentifiedImageError
 
-from nonebot_plugin_orm import get_session
 from sqlalchemy import select
 
 from .utils import info_calc
@@ -21,6 +20,7 @@ from ..database.models import InfoData
 from ..schema.draw_info import DrawUser, Badge, DrawBestPlay
 from ..schema.user import UnifiedUser
 from ..api import get_user_info_data, get_user_scores
+from ..runtime import get_session
 
 
 _STAR_RATING_MODS = frozenset({"DT", "NC", "HT", "HR", "EZ", "DC", "DA"})

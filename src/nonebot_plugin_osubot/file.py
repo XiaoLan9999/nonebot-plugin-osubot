@@ -6,19 +6,19 @@ from pathlib import Path
 from typing import Union, Optional
 from io import BytesIO, TextIOWrapper
 
-from nonebot.log import logger
-
 from .schema import Badge
+from .runtime import get_data_root, logger
 from .exceptions import NetworkError
 from .network import auto_retry
 from .api import safe_async_get
 from .network.first_response import get_first_response
 
 osufile = Path(__file__).parent / "osufile"
-map_path = Path() / "data" / "osu" / "map"
-user_cache_path = Path() / "data" / "osu" / "user"
-badge_cache_path = Path() / "data" / "osu" / "badge"
-team_cache_path = Path() / "data" / "osu" / "team"
+_data_root = get_data_root()
+map_path = _data_root / "map"
+user_cache_path = _data_root / "user"
+badge_cache_path = _data_root / "badge"
+team_cache_path = _data_root / "team"
 api_ls = [
     "https://osu.direct/api/d/",
     "https://txy1.sayobot.cn/beatmaps/download/novideo/",

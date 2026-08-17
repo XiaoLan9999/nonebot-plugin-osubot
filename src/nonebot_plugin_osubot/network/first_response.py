@@ -1,11 +1,11 @@
 import asyncio
 
 from httpx import AsyncClient
-from nonebot import get_plugin_config
 
 from ..config import Config
+from ..runtime import get_config
 
-plugin_config = get_plugin_config(Config)
+plugin_config = get_config()
 proxy = plugin_config.osu_proxy
 
 

@@ -1,0 +1,12 @@
+aiosqlite>=0.19.0
+apscheduler>=3.10.0
+expiringdict>=1.2.2
+httpx>=0.23.3
+matplotlib>=3.7.1
+osu-tools-py>=0.1.4
+pillow>=9.2.0
+pydantic>=1.10.0,<3.0.0,!=2.5.0,!=2.5.1
+resvg-py>=0.3.3,<0.4
+rhythmgame-tools>=2.0.0
+rosu-pp-py==3.1.0
+sqlalchemy>=2.0.0

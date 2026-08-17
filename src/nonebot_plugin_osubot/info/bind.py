@@ -1,12 +1,11 @@
 from datetime import date
 
-from nonebot.log import logger
-from nonebot_plugin_orm import get_session
 from sqlalchemy import select
 
 from ..utils import FGM
 from ..api import get_osu_user, get_users
 from ..database.models import InfoData, UserData
+from ..runtime import get_session, logger
 
 
 async def bind_user_info(project: str, uid, qid) -> str:

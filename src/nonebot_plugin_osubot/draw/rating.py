@@ -6,7 +6,7 @@ from collections import Counter
 from statistics import mode, median
 
 import jinja2
-from nonebot.log import logger
+from ..runtime import logger
 from PIL import Image, ImageDraw
 
 from ..api import api_info

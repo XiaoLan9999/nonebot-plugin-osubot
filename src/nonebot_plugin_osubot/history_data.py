@@ -4,15 +4,13 @@ import datetime
 from collections.abc import Iterable
 
 from expiringdict import ExpiringDict
-from nonebot import get_plugin_config
-from nonebot.log import logger
-
 from .api import safe_async_get
 from .config import Config
+from .runtime import get_config, logger
 
 HistoryPoint = tuple[float, str, int]
 
-plugin_config = get_plugin_config(Config)
+plugin_config = get_config()
 history_cache: ExpiringDict = ExpiringDict(max_len=256, max_age_seconds=600)
 
 

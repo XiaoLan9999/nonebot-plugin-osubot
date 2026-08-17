@@ -5,7 +5,7 @@ from pathlib import Path
 
 from rosu_pp_py import Beatmap, Difficulty, GameMode, Performance, Strains
 from osu_tools import OsuCalculator, CalculationResult
-from nonebot.log import logger
+from .runtime import logger
 
 from .exceptions import NetworkError
 from .schema.score import Mod, UnifiedScore

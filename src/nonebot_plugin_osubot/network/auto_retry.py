@@ -3,7 +3,7 @@ from functools import wraps
 from typing import TypeVar, Callable
 from typing_extensions import ParamSpec
 
-from nonebot import logger
+from ..runtime import logger
 
 T = TypeVar("T")
 P = ParamSpec("P")

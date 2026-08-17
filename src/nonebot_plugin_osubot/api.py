@@ -4,15 +4,14 @@ from urllib.parse import quote, urlencode
 from datetime import datetime, timedelta
 from typing import Union, Literal, Optional
 
-from nonebot.log import logger
 from expiringdict import ExpiringDict
-from nonebot import get_plugin_config
 from httpx import HTTPError, Response
 
 from .network.manager import network_manager
 from .schema.beatmapsets import BeatmapSets
 from .utils import FGM, extract_user_id
 from .config import Config
+from .runtime import get_config, logger
 from .mods import get_mods
 from .network import auto_retry
 from .exceptions import NetworkError
@@ -31,7 +30,7 @@ beatmap_search_cache = ExpiringDict(max_len=100, max_age_seconds=300)
 # 谱面集详情用于 bmap 绘图，短时缓存可避免同一谱面集连续查询重复等待 API。
 beatmapset_cache = ExpiringDict(max_len=256, max_age_seconds=300)
 _beatmapset_tasks: dict[int, asyncio.Task[BeatmapSets]] = {}
-plugin_config = get_plugin_config(Config)
+plugin_config = get_config()
 
 key = plugin_config.osu_key
 client_id = plugin_config.osu_client
@@ -450,7 +449,16 @@ async def get_user_info(url: str) -> dict:
 async def get_users(users: list[int]):
     headers = await get_headers()
     req = await safe_async_get(f"{api}/users", headers=headers, params={"ids[]": users})
-    return [User(**i) for i in req.json()["users"]] if req else []
+    payload = req.json() if req else {}
+    if req and req.status_code == 401:
+        cache.pop("token", None)
+        req = await safe_async_get(f"{api}/users", headers=await get_headers(), params={"ids[]": users})
+        payload = req.json() if req else {}
+    result = payload.get("users") if isinstance(payload, dict) else None
+    if not req or req.status_code != 200 or not isinstance(result, list):
+        detail = payload.get("error", payload) if isinstance(payload, dict) else payload
+        raise NetworkError(f"批量更新玩家数据失败: HTTP {getattr(req, 'status_code', 'N/A')} {detail}")
+    return [User(**item) for item in result]
 
 
 async def _fetch_beatmapset(sid: int) -> BeatmapSets:

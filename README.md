@@ -24,6 +24,25 @@ _✨ 面向 NoneBot2 的 osu! 查询与谱面工具插件 ✨_
 
 </div>
 
+## AstrBot native adapter
+
+The `astrbot-native` branch is a native AstrBot adapter built directly on this
+project's 7.2.8 source tree. It does not use `astrbot_plugin_osutrack` as its
+implementation. The adapter reuses OSUBot's API schemas, score normalization,
+PP calculator, beatmap cache, SQLite history, and native SVG card renderer.
+
+Implemented AstrBot commands include `/bind`, `/unbind`, `/mode`, `/info`,
+`/bp`, `/bl`, `/tbp`, `/recent`, `/pr`, `/map`, `/bmap`, `/score`, `/history`,
+`/update`, `/mu`, and `/osuhelp`. Existing AiriBot OSUBot bindings, history,
+and cache can be imported once through `_conf_schema.json`.
+
+Linux score rendering requires the .NET 8 runtime because `osu-tools-py` uses
+it for PP calculation. On Ubuntu 24.04 it can be installed with:
+
+```bash
+sudo apt install dotnet-runtime-8.0
+```
+
 
 ## 📖 介绍
 

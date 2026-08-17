@@ -1,0 +1,43 @@
+{
+  "osu_client": {
+    "description": "osu! OAuth Client ID",
+    "type": "int",
+    "default": 0
+  },
+  "osu_key": {
+    "description": "osu! OAuth Client Secret",
+    "type": "string",
+    "default": "",
+    "obvious_hint": false
+  },
+  "osu_proxy": {
+    "description": "可选 HTTP/SOCKS 代理地址",
+    "type": "string",
+    "default": ""
+  },
+  "osutrack_enabled": {
+    "description": "允许使用 osu!track 补充历史数据",
+    "type": "bool",
+    "default": true
+  },
+  "osutrack_default_days": {
+    "description": "默认历史查询天数",
+    "type": "int",
+    "default": 365
+  },
+  "import_airibot_data": {
+    "description": "首次启动时自动导入 AiriBot 的 OSUBot 数据",
+    "type": "bool",
+    "default": true
+  },
+  "airibot_database_path": {
+    "description": "AiriBot nonebot-plugin-orm SQLite 路径",
+    "type": "string",
+    "default": "/data/apps/airibot/data/nonebot_plugin_orm/db.sqlite3"
+  },
+  "airibot_cache_path": {
+    "description": "AiriBot OSUBot 缓存目录",
+    "type": "string",
+    "default": "/data/apps/airibot/data/osu"
+  }
+}
