@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 import time
 import urllib.parse
 from typing import Any, Optional
 
 from ..osuapi import OsuApi
 from .token_manager import TokenData, TokenManager
+
+logger = logging.getLogger(__name__)
 
 
 class OAuthClient:
@@ -22,6 +25,7 @@ class OAuthClient:
     ) -> None:
         self.api = OsuApi(client_id, client_secret, redirect_uri)
         self.token_manager = token_manager
+        self._refresh_retry_after: dict[str, float] = {}
 
     # ------------------------------------------------------------------
     # Authorization
@@ -62,6 +66,8 @@ class OAuthClient:
         Returns ``None`` when no usable token exists.
         """
         if self.token_manager.is_expired(platform_id):
+            if time.monotonic() < self._refresh_retry_after.get(platform_id, 0):
+                return None
             refreshed = await self._refresh(platform_id)
             if not refreshed:
                 return None
@@ -82,8 +88,11 @@ class OAuthClient:
                 scope=data.get("scope", td.scope),
             )
             self.token_manager.save(platform_id, new_td)
+            self._refresh_retry_after.pop(platform_id, None)
             return True
-        except Exception:
+        except Exception as exc:
+            self._refresh_retry_after[platform_id] = time.monotonic() + 300
+            logger.warning("osu! OAuth token refresh failed for platform %s: %s", platform_id, exc)
             return False
 
     # ------------------------------------------------------------------

@@ -36,7 +36,7 @@ except ImportError:
     "osu",
     "XiaoLan9999 / gameswu / yaowan233",
     "osu! AstrBot 插件",
-    "0.4.0",
+    "0.4.1",
     "https://github.com/XiaoLan9999/nonebot-plugin-osubot/tree/astrbot",
 )
 class OsuTrackPlugin(Star):
@@ -427,13 +427,13 @@ class OsuTrackPlugin(Star):
 
     @osu_group.command("me", alias={"我", "个人"})
     async def get_me(self, event: AstrMessageEvent, mode: str = None):
-        auth_ok, platform_id, osu_id = await self._check_auth(event, need_identify=True)
+        auth_ok, platform_id, osu_id = await self._check_auth(event)
         if not auth_ok:
             return
 
         try:
             await event.send(MessageChain([Comp.Plain(get_info("common.loading", type="个人"))]))
-            user_info = await self.osu.get_own_data(platform_id, mode)
+            user_info = await self.osu.get_user(platform_id, int(osu_id), mode)
             # 尝试文转图
             img_url = await self._render_user_card(user_info)
             if img_url:
@@ -860,7 +860,7 @@ class OsuTrackPlugin(Star):
                     error=f"在过去 {days} 天内没有找到任何统计数据"))]))
                 return
 
-            user_info = await self.osu.get_own_data(platform_id, validated_mode)
+            user_info = await self.osu.get_user(platform_id, int(osu_id), validated_mode)
             username = user_info.username
 
             if type == "pp":
@@ -1805,8 +1805,8 @@ class OsuTrackPlugin(Star):
             username(string): osu! 玩家的用户名或数字 ID
         '''
         platform_id = event.get_sender_id()
-        if not self.link_mgr.get_osu_id(platform_id) or not self.osu.has_valid_token(platform_id):
-            yield event.plain_result("用户尚未绑定 osu! 账号或授权已过期，请先使用 /osu link 绑定。")
+        if not self.link_mgr.get_osu_id(platform_id):
+            yield event.plain_result("用户尚未绑定 osu! 账号，请先使用 /osu link 绑定。")
             return
         try:
             processed: str | int = int(username) if username.isdigit() else username
@@ -1829,8 +1829,8 @@ class OsuTrackPlugin(Star):
             beatmap_id(string): osu! 谱面的数字 ID
         '''
         platform_id = event.get_sender_id()
-        if not self.link_mgr.get_osu_id(platform_id) or not self.osu.has_valid_token(platform_id):
-            yield event.plain_result("用户尚未绑定 osu! 账号或授权已过期，请先使用 /osu link 绑定。")
+        if not self.link_mgr.get_osu_id(platform_id):
+            yield event.plain_result("用户尚未绑定 osu! 账号，请先使用 /osu link 绑定。")
             return
         try:
             bm = await self.osu.get_beatmap(platform_id, int(beatmap_id))
@@ -1853,8 +1853,8 @@ class OsuTrackPlugin(Star):
             limit(string): 返回数量，1-10，默认 5
         '''
         platform_id = event.get_sender_id()
-        if not self.link_mgr.get_osu_id(platform_id) or not self.osu.has_valid_token(platform_id):
-            yield event.plain_result("用户尚未绑定 osu! 账号或授权已过期，请先使用 /osu link 绑定。")
+        if not self.link_mgr.get_osu_id(platform_id):
+            yield event.plain_result("用户尚未绑定 osu! 账号，请先使用 /osu link 绑定。")
             return
         try:
             processed: str | int = int(username) if username.isdigit() else username
@@ -1886,8 +1886,8 @@ class OsuTrackPlugin(Star):
             limit(string): 返回数量，1-10，默认 5
         '''
         platform_id = event.get_sender_id()
-        if not self.link_mgr.get_osu_id(platform_id) or not self.osu.has_valid_token(platform_id):
-            yield event.plain_result("用户尚未绑定 osu! 账号或授权已过期，请先使用 /osu link 绑定。")
+        if not self.link_mgr.get_osu_id(platform_id):
+            yield event.plain_result("用户尚未绑定 osu! 账号，请先使用 /osu link 绑定。")
             return
         try:
             processed: str | int = int(username) if username.isdigit() else username
@@ -1917,8 +1917,8 @@ class OsuTrackPlugin(Star):
             query(string): 搜索关键词（曲名、艺术家、谱师等）
         '''
         platform_id = event.get_sender_id()
-        if not self.link_mgr.get_osu_id(platform_id) or not self.osu.has_valid_token(platform_id):
-            yield event.plain_result("用户尚未绑定 osu! 账号或授权已过期，请先使用 /osu link 绑定。")
+        if not self.link_mgr.get_osu_id(platform_id):
+            yield event.plain_result("用户尚未绑定 osu! 账号，请先使用 /osu link 绑定。")
             return
         try:
             result = await self.osu.search_beatmapsets(platform_id, query=query)
@@ -1951,8 +1951,8 @@ class OsuTrackPlugin(Star):
         '''
         platform_id = event.get_sender_id()
         osu_id = self.link_mgr.get_osu_id(platform_id)
-        if not osu_id or not self.osu.has_valid_token(platform_id):
-            yield event.plain_result("用户尚未绑定 osu! 账号或授权已过期，请先使用 /osu link 绑定。")
+        if not osu_id:
+            yield event.plain_result("用户尚未绑定 osu! 账号，请先使用 /osu link 绑定。")
             return
         try:
             if username:
@@ -1962,7 +1962,7 @@ class OsuTrackPlugin(Star):
                 uname = user_info.username
             else:
                 uid = int(osu_id)
-                own = await self.osu.get_own_data(platform_id)
+                own = await self.osu.get_user(platform_id, uid)
                 uname = own.username
             result = await self.osu.get_user_beatmap_score(platform_id, int(beatmap_id), uid)
             score = result.score
@@ -1990,8 +1990,8 @@ class OsuTrackPlugin(Star):
             type(string): 排行类型，可选 performance / score，默认 performance
         '''
         platform_id = event.get_sender_id()
-        if not self.link_mgr.get_osu_id(platform_id) or not self.osu.has_valid_token(platform_id):
-            yield event.plain_result("用户尚未绑定 osu! 账号或授权已过期，请先使用 /osu link 绑定。")
+        if not self.link_mgr.get_osu_id(platform_id):
+            yield event.plain_result("用户尚未绑定 osu! 账号，请先使用 /osu link 绑定。")
             return
         try:
             data = await self.osu.get_ranking(platform_id, mode, type)
@@ -2028,8 +2028,8 @@ class OsuTrackPlugin(Star):
             locale(string): 语言，默认 zh（中文），可选 en（英文）等
         '''
         platform_id = event.get_sender_id()
-        if not self.link_mgr.get_osu_id(platform_id) or not self.osu.has_valid_token(platform_id):
-            yield event.plain_result("用户尚未绑定 osu! 账号或授权已过期，请先使用 /osu link 绑定。")
+        if not self.link_mgr.get_osu_id(platform_id):
+            yield event.plain_result("用户尚未绑定 osu! 账号，请先使用 /osu link 绑定。")
             return
         try:
             data = await self.osu.get_wiki_page(platform_id, locale, path)
@@ -2067,8 +2067,8 @@ class OsuTrackPlugin(Star):
             news_id(string): 新闻文章的数字 ID 或 slug（可选，为空则返回列表）
         '''
         platform_id = event.get_sender_id()
-        if not self.link_mgr.get_osu_id(platform_id) or not self.osu.has_valid_token(platform_id):
-            yield event.plain_result("用户尚未绑定 osu! 账号或授权已过期，请先使用 /osu link 绑定。")
+        if not self.link_mgr.get_osu_id(platform_id):
+            yield event.plain_result("用户尚未绑定 osu! 账号，请先使用 /osu link 绑定。")
             return
         try:
             if news_id:
@@ -2176,15 +2176,15 @@ class OsuTrackPlugin(Star):
             await event.send(MessageChain([Comp.Plain(get_info("auth_check.not_linked"))]))
             return False, platform_id, ""
 
-        if not self.osu.has_valid_token(platform_id):
-            await event.send(MessageChain([Comp.Plain(get_info("auth_check.expired"))]))
-            return False, platform_id, osu_id
-
         missing: list[str] = []
-        if need_identify and not self.osu.has_scope(platform_id, "identify"):
-            missing.append("identify")
-        if need_friends and not self.osu.has_scope(platform_id, "friends.read"):
-            missing.append("friends.read")
+        if need_identify or need_friends:
+            if not await self.oauth.ensure_token(platform_id):
+                await event.send(MessageChain([Comp.Plain(get_info("auth_check.expired"))]))
+                return False, platform_id, osu_id
+            if need_identify and not self.osu.has_scope(platform_id, "identify"):
+                missing.append("identify")
+            if need_friends and not self.osu.has_scope(platform_id, "friends.read"):
+                missing.append("friends.read")
 
         if missing:
             await event.send(MessageChain([Comp.Plain(

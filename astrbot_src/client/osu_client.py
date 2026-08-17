@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import time
 from typing import Any, Optional, Union
 
 from ..osuapi import OsuClient, UserExtended, BeatmapExtended, BeatmapsetExtended, BeatmapsetSearchResult, Score, BeatmapScores, BeatmapUserScore
@@ -31,11 +33,28 @@ class OsuApiClient:
             client_secret=oauth.api.client_secret,
             redirect_uri=oauth.api.redirect_uri,
         )
+        self._application_token = ""
+        self._application_token_expires_at = 0.0
+        self._application_token_lock = asyncio.Lock()
 
-    async def _set_token(self, platform_id: str) -> None:
+    async def _get_application_token(self) -> str:
+        if self._application_token and time.time() < self._application_token_expires_at - 300:
+            return self._application_token
+
+        async with self._application_token_lock:
+            if self._application_token and time.time() < self._application_token_expires_at - 300:
+                return self._application_token
+            data = await self._api.client_credentials(["public"])
+            self._application_token = data["access_token"]
+            self._application_token_expires_at = time.time() + data.get("expires_in", 86400)
+            return self._application_token
+
+    async def _set_token(self, platform_id: str, *, require_user: bool = False) -> None:
         token = await self._oauth.ensure_token(platform_id)
         if not token:
-            raise ValueError(f"没有有效的访问令牌 (platform_id={platform_id})，请先使用 /osu link 进行授权。")
+            if require_user:
+                raise ValueError(f"没有有效的用户访问令牌 (platform_id={platform_id})，请使用 /osu link 重新授权。")
+            token = await self._get_application_token()
         self._api.set_access_token(token)
 
     # ------------------------------------------------------------------
@@ -67,11 +86,11 @@ class OsuApiClient:
         platform_id: str,
         mode: Optional[str] = None,
     ) -> UserExtended:
-        await self._set_token(platform_id)
+        await self._set_token(platform_id, require_user=True)
         return await self._api.users.get_own_data(mode=mode)
 
     async def get_friends(self, platform_id: str) -> list:
-        await self._set_token(platform_id)
+        await self._set_token(platform_id, require_user=True)
         return await self._api.users.get_friends()
 
     async def get_user_scores(
@@ -338,7 +357,7 @@ class OsuApiClient:
     async def get_beatmapset_favourites(
         self, platform_id: str,
     ) -> list[dict[str, Any]]:
-        await self._set_token(platform_id)
+        await self._set_token(platform_id, require_user=True)
         return await self._api.users.get_beatmapset_favourites()
 
     # ------------------------------------------------------------------

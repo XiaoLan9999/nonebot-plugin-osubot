@@ -7,6 +7,9 @@
 > Configure the osu! API Client ID, Client Secret and callback URI in AstrBot.
 > OAuth tokens, account links and news state are stored under AstrBot's
 > `plugin_data/osu` directory and are never committed.
+> Public queries automatically fall back to an application OAuth token when a
+> user's delegated token expires. `/osu friends` and favourites still require
+> the user to run `/osu link` again when osu! rejects the refresh token.
 >
 > Based on upstream `master` commit `6af33a9`, with the AstrBot API/track
 > integration from `gameswu/astrbot_plugin_osutrack`. Upstream AGPL-3.0
