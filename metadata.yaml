@@ -1,6 +1,6 @@
 name: osu
 display_name: OSUBot (AiriBot 7.2.8 port)
 desc: nonebot-plugin-osubot 7.2.8 的 AstrBot 原生适配，复用完整 API、PP 计算、谱面和 SVG 绘图核心。
-version: v0.5.1
+version: v0.6.0
 author: XiaoLan9999 / yaowan233
 repo: https://github.com/XiaoLan9999/nonebot-plugin-osubot

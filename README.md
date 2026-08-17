@@ -31,10 +31,16 @@ project's 7.2.8 source tree. It does not use `astrbot_plugin_osutrack` as its
 implementation. The adapter reuses OSUBot's API schemas, score normalization,
 PP calculator, beatmap cache, SQLite history, and native SVG card renderer.
 
-Implemented AstrBot commands include `/bind`, `/unbind`, `/mode`, `/info`,
-`/bp`, `/bl`, `/tbp`, `/recent`, `/pr`, `/map`, `/bmap`, `/score`, `/history`,
-`/update`, `/mu`, and `/osuhelp`. Existing AiriBot OSUBot bindings, history,
-and cache can be imported once through `_conf_schema.json`.
+The adapter covers the complete AiriBot command surface: account binding,
+official and ppysb queries, BP/recent/score lists and analysis, history and
+group ranking, recommendation, multiplayer analysis, medal lookup, beatmap
+context/background/download/preview/conversion, URL parsing, and all three
+guessing games with hints. Existing AiriBot OSUBot bindings, history, and cache
+can be imported once through `_conf_schema.json`.
+
+Commands are intended to use `/` exclusively. Configure AstrBot's global
+`wake_prefix` as `["/"]`; aliases such as `/info:m`, `/bl:4 &sb`, and `/vp`
+remain available.
 
 Linux score rendering requires the .NET 8 runtime because `osu-tools-py` uses
 it for PP calculation. On Ubuntu 24.04 it can be installed with:
@@ -42,6 +48,10 @@ it for PP calculation. On Ubuntu 24.04 it can be installed with:
 ```bash
 sudo apt install dotnet-runtime-8.0
 ```
+
+HTML chart and multiplayer-card rendering also requires Playwright Chromium.
+Install it into the same directory configured by `playwright_browser_path` (or
+the default `data/plugin_data/astrbot_plugin_osubot/playwright` directory).
 
 
 ## 📖 介绍

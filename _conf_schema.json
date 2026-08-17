@@ -25,6 +25,11 @@
     "type": "int",
     "default": 365
   },
+  "playwright_browser_path": {
+    "description": "Playwright Chromium 安装目录；留空时使用插件数据目录",
+    "type": "string",
+    "default": ""
+  },
   "import_airibot_data": {
     "description": "首次启动时自动导入 AiriBot 的 OSUBot 数据",
     "type": "bool",
